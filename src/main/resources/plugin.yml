@@ -1,0 +1,30 @@
+name: PlayerRegions
+version: ${project.version}
+main: se.hertzole.playerregions.PlayerRegions
+api-version: 1.13
+prefix: PlayerRegions
+authors: [Hertzole]
+description: A plugin that allows players to claim their own regions, but for a price.
+website: www.hertzole.se
+depend: [Vault, WorldEdit, WorldGuard]
+commands:
+  pr:
+    description: Base command for Player Regions.
+    usage: |
+      Player Regions failed to load.
+      There is an error in your server log with details.
+    aliases: [playerregions]
+permissions:
+  playerregions.user:
+    description: Gives access to all basic user commands.
+    default: true
+    children:
+      playerregions.user.pos: true
+      playerregions.user.claim: true
+      playerregions.user.confirm: true
+      playerregions.user.deny: true
+  playerregions.admin:
+    description: Gives access to all admin commands.
+    default: op
+    children:
+      playerregions.admin.reload: true

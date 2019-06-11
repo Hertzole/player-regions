@@ -1,0 +1,11 @@
+prefix: '&f[&aPlayer Regions&f]'
+cost-per-column: 100
+get-refund: true
+# The percentage of the price that is refunded when removed.
+# Goes from 0-1, 1 being 100%.
+refund-percent: 0.5
+max-regions: 2
+min-size-x: 2
+max-size-x: 20
+min-size-z: 2
+max-size-z: 20
