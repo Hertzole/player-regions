@@ -2,6 +2,7 @@ package se.hertzole.playerregions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -28,11 +29,30 @@ public class RegionManager {
     private FileConfiguration regionsConfig = null;
     private File regionsConfigFile = null;
 
+    private int minX;
+    private int maxX;
+    private int minZ;
+    private int maxZ;
+    private int maxClaims;
+
     public RegionManager(PlayerRegions plugin) {
         this.plugin = plugin;
     }
 
-    public void reloadRegions() {
+    public void reloadConfig(FileConfiguration config) {
+        reloadLimits(config);
+        reloadRegions();
+    }
+
+    private void reloadLimits(FileConfiguration config) {
+        minX = config.getInt("min-size-x", 0);
+        maxX = config.getInt("max-size-x", 0);
+        minZ = config.getInt("min-size-z", 0);
+        maxZ = config.getInt("max-size-z", 0);
+        maxClaims = config.getInt("max-regions", 0);
+    }
+
+    private void reloadRegions() {
         if (regionsConfigFile == null) {
             regionsConfigFile = new File(plugin.getDataFolder(), "regions.yml");
         }
@@ -114,6 +134,21 @@ public class RegionManager {
         }
     }
 
+    public boolean overlapsUnownedRegion(Player player, double minX, double maxX, double minZ, double maxZ) {
+        RegionContainer container = PlayerRegions.getWorldGuard().getPlatform().getRegionContainer();
+        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(player.getWorld()));
+
+        if (regions == null)
+            return false;
+
+        BlockVector3 pos1 = BlockVector3.at(minX, 0, minZ);
+        BlockVector3 pos2 = BlockVector3.at(maxX, 255, maxZ);
+
+        ProtectedRegion region = new ProtectedCuboidRegion("temp", pos1, pos2);
+
+        return regions.overlapsUnownedRegion(region, WorldGuardPlugin.inst().wrapPlayer(player));
+    }
+
     public boolean playerHasRegion(Player player, String regionId) {
         List<String> regions = getPlayerRegionNames(player);
         if (regions == null || regions.size() == 0)
@@ -139,5 +174,53 @@ public class RegionManager {
         Collections.sort(result);
 
         return result;
+    }
+
+    public List<String> getPlayerRegionPrettyNames(Player player) {
+        List<String> result = new ArrayList<>();
+
+        List<String> regionNames = getPlayerRegionNames(player);
+
+        FileConfiguration regionsConfig = getRegionsConfig();
+
+        for (int i = 0; i < regionNames.size(); i++) {
+            result.add(regionsConfig.getString("players." + player.getUniqueId() + "." + regionNames.get(i) + ".name"));
+        }
+
+        return result;
+    }
+
+    public int getPlayerRegionCount(Player player) {
+        int result = 0;
+
+        FileConfiguration regionsConfig = getRegionsConfig();
+        if (regionsConfig == null)
+            return result;
+        if (!regionsConfig.contains("players." + player.getUniqueId()))
+            return result;
+
+        result = regionsConfig.getConfigurationSection("players." + player.getUniqueId()).getKeys(false).size();
+
+        return result;
+    }
+
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMinZ() {
+        return minZ;
+    }
+
+    public int getMaxZ() {
+        return maxZ;
+    }
+
+    public int getMaxClaims() {
+        return maxClaims;
     }
 }

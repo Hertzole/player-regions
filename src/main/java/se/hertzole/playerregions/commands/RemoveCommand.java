@@ -20,7 +20,8 @@ import se.hertzole.playerregions.data.Setup;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandInfo(name = "remove", pattern = "remove", usage = "/pr remove <region>", desc = "Removes your region.", permission = "playerregions.user.remove")
+@CommandInfo(name = "remove", pattern = "remove", usage = "/pr remove <region>", desc = "Removes your region.",
+        permission = "playerregions.user.remove", console = false)
 public class RemoveCommand implements Command {
 
     @Override
@@ -89,7 +90,7 @@ public class RemoveCommand implements Command {
     @Override
     public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias, int argIndex) {
         if (argIndex == 0) {
-            List<String> result = PlayerRegions.instance.getRegionManager().getPlayerRegionNames((Player) sender);
+            List<String> result = PlayerRegions.instance.getRegionManager().getPlayerRegionPrettyNames((Player) sender);
 
             return result;
         } else {

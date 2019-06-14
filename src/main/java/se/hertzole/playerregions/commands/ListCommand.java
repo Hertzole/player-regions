@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@CommandInfo(name = "list", pattern = "list", usage = "/pr list", desc = "Lists all your regions.", permission = "playerregions.user.list")
+@CommandInfo(name = "list", pattern = "list", usage = "/pr list", desc = "Lists all your regions.",
+        permission = "playerregions.user.list", console = false)
 public class ListCommand implements Command {
 
     @Override
@@ -30,19 +31,25 @@ public class ListCommand implements Command {
             plugin.getGlobalMessenger().tell(sender, Msg.NO_REGIONS);
         }
 
-        StringBuilder sb = new StringBuilder("Your regions:");
-
         ConfigurationSection playerRegions = regionsConfig.getConfigurationSection("players." + player.getUniqueId());
-        Set<String> regions = playerRegions.getKeys(false);
+        if (playerRegions != null) {
 
-        int index = 1;
+            Set<String> regions = playerRegions.getKeys(false);
+            if (regions.size() > 0) {
+                StringBuilder sb = new StringBuilder("Your regions:");
 
-        for (String i : regions) {
-            sb.append("\n&6[" + index + "]&r " + regionsConfig.getString("players." + player.getUniqueId() + "." + i + ".name"));
-            index++;
+                int index = 1;
+
+                for (String i : regions) {
+                    sb.append("\n&6[" + index + "]&r " + regionsConfig.getString("players." + player.getUniqueId() + "." + i + ".name"));
+                    index++;
+                }
+
+                plugin.getGlobalMessenger().tell(sender, sb.toString());
+            } else {
+                plugin.getGlobalMessenger().tell(sender, Msg.NO_REGIONS);
+            }
         }
-
-        plugin.getGlobalMessenger().tell(sender, sb.toString());
 
         return true;
     }

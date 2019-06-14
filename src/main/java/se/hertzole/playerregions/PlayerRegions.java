@@ -2,14 +2,20 @@ package se.hertzole.playerregions;
 
 import com.sk89q.worldguard.WorldGuard;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import se.hertzole.mchertzlib.HertzPlugin;
 import se.hertzole.mchertzlib.commands.BaseCommandHandler;
 import se.hertzole.mchertzlib.messages.Messenger;
+import se.hertzole.mchertzlib.utils.ConfigUtil;
 import se.hertzole.playerregions.commands.CommandHandler;
+
+import java.io.File;
+import java.io.IOException;
 
 public final class PlayerRegions extends HertzPlugin {
 
@@ -17,6 +23,8 @@ public final class PlayerRegions extends HertzPlugin {
 
     private SetupManager setupManager;
     private RegionManager regionManager;
+
+    private Msg messages;
 
     public static PlayerRegions instance;
 
@@ -46,12 +54,37 @@ public final class PlayerRegions extends HertzPlugin {
 
     @Override
     protected void onReload() {
-        regionManager.reloadRegions();
+        reloadMessages();
+    }
+
+    private void reloadMessages() {
+        File file = new File(getDataFolder(), "messages.yml");
+        try {
+            if (file.createNewFile()) {
+                getLogger().info("messages.yml created");
+                YamlConfiguration yaml = Msg.toYaml();
+                yaml.save(file);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            YamlConfiguration yaml = new YamlConfiguration();
+            yaml.load(file);
+            ConfigUtil.addMissingRemoveObsolete(file, Msg.toYaml(), yaml);
+            Msg.load(yaml);
+        } catch (IOException e) {
+            throw new RuntimeException("There was an error reading the messages-file.\n" + e.getMessage());
+        } catch (InvalidConfigurationException e) {
+            throw new RuntimeException("\n\n>>>\n>>> There is an error in your messages-file! Handle it!\n>>> Here's what snakeyaml says:\n>>>\n\n" + e.getMessage());
+        }
     }
 
     @Override
     protected void onReloadConfig(FileConfiguration config) {
-
+        regionManager.reloadConfig(config);
     }
 
     @Override

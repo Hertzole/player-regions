@@ -13,7 +13,8 @@ import se.hertzole.playerregions.data.Setup;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandInfo(name = "confirm", pattern = "confirm", usage = "/pr confirm", desc = "Confirms an action.", permission = "playerregions.user.confirm")
+@CommandInfo(name = "confirm", pattern = "confirm", usage = "/pr confirm", desc = "Confirms an action.",
+        permission = "playerregions.user.confirm", console = false)
 public class ConfirmCommand implements Command {
 
     @Override

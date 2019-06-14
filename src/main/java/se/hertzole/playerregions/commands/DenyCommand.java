@@ -12,7 +12,8 @@ import se.hertzole.playerregions.data.Setup;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandInfo(name = "deny", pattern = "deny", usage = "/pr deny", desc = "Denies an action.", permission = "playerregions.user.deny")
+@CommandInfo(name = "deny", pattern = "deny", usage = "/pr deny", desc = "Denies an action.",
+        permission = "playerregions.user.deny", console = false)
 public class DenyCommand implements Command {
 
     @Override
@@ -33,7 +34,7 @@ public class DenyCommand implements Command {
 
         pr.getSetupManager().removeSetup(player);
 
-        plugin.getGlobalMessenger().tell(sender, Msg.DENIED);
+        plugin.getGlobalMessenger().tell(sender, Msg.DENY_CLAIM);
 
         return true;
     }

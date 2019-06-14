@@ -13,14 +13,25 @@ import se.hertzole.playerregions.data.Setup;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandInfo(name = "claim", pattern = "claim", permission = "playerregions.user.claim", usage = "/pr claim <name>", desc = "Claims a region after two points are set.")
+@CommandInfo(name = "claim", pattern = "claim", permission = "playerregions.user.claim", usage = "/pr claim <name>",
+        desc = "Claims a region after two points are set.", console = false)
 public class ClaimCommand implements Command {
-
 
     @Override
     public boolean execute(HertzPlugin plugin, CommandSender sender, String... args) {
         PlayerRegions re = (PlayerRegions) plugin;
         Player player = (Player) sender;
+
+        int maxClaims = re.getRegionManager().getMaxClaims();
+        if (re.getRegionManager().getPlayerRegionCount(player) >= maxClaims) {
+            re.getGlobalMessenger().tell(sender, Msg.TOO_MANY_CLAIMS.toString().replace("{max}", Integer.toString(maxClaims)));
+            return true;
+        }
+
+        if (args == null || args.length == 0 || args[0].isEmpty()) {
+            re.getGlobalMessenger().tell(sender, Msg.NO_CLAIM_NAME);
+            return true;
+        }
 
         Setup setup = re.getSetupManager().getOrCreateSetup(player);
         setup.wantsToRemove = false;
@@ -62,6 +73,34 @@ public class ClaimCommand implements Command {
             double temp = minZ;
             minZ = maxZ;
             maxZ = temp;
+        }
+
+        if (re.getRegionManager().overlapsUnownedRegion(player, minX, maxX, minZ, maxZ)) {
+            plugin.getGlobalMessenger().tell(sender, Msg.OVERLAPS);
+            return true;
+        }
+
+        int totalXBlocks = 0;
+        int totalZBlocks = 0;
+
+        for (int x = (int) minX; x <= (maxX); x++) {
+            totalXBlocks++;
+        }
+
+        for (int z = (int) minX; z <= (maxX); z++) {
+            totalZBlocks++;
+        }
+
+        if ((re.getRegionManager().getMinX() > 0 && totalXBlocks < re.getRegionManager().getMinX()) ||
+                (re.getRegionManager().getMinZ() > 0 && totalZBlocks < re.getRegionManager().getMinZ())) {
+            plugin.getGlobalMessenger().tell(sender, Msg.TOO_SMALL);
+            return true;
+        }
+
+        if ((re.getRegionManager().getMaxX() > 0 && totalXBlocks > re.getRegionManager().getMaxX()) ||
+                (re.getRegionManager().getMaxZ() > 0 && totalZBlocks > re.getRegionManager().getMaxZ())) {
+            plugin.getGlobalMessenger().tell(sender, Msg.TOO_BIG);
+            return true;
         }
 
         for (int x = (int) minX; x <= maxX; x++) {

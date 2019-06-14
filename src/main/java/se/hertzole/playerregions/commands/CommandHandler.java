@@ -2,6 +2,7 @@ package se.hertzole.playerregions.commands;
 
 import se.hertzole.mchertzlib.HertzPlugin;
 import se.hertzole.mchertzlib.commands.BaseCommandHandler;
+import se.hertzole.playerregions.Msg;
 
 public class CommandHandler extends BaseCommandHandler {
 
@@ -21,26 +22,31 @@ public class CommandHandler extends BaseCommandHandler {
 
     @Override
     protected String getReloadPermission() {
-        return "playerregions.admin.reload";
+        return "playerregions.admin.reloadConfig";
     }
 
     @Override
     protected String getHelpMessage() {
-        return null;
+        return Msg.MISC_HELP.toString();
     }
 
     @Override
     protected String getMultipleMatchesMessage() {
-        return null;
+        return Msg.MISC_MULTIPLE_MATCHES.toString();
     }
 
     @Override
     protected String getUnknownCommandMessage() {
-        return null;
+        return Msg.MISC_NO_MATCHES.toString();
     }
 
     @Override
     protected String getNoPermissionMessage() {
-        return null;
+        return Msg.MISC_NO_PERMISSION.toString();
+    }
+
+    @Override
+    protected String getNoConsoleMessage() {
+        return Msg.MISC_NOT_FROM_CONSOLE.toString();
     }
 }
