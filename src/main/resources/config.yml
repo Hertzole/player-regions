@@ -9,3 +9,10 @@ min-size-x: 2
 max-size-x: 20
 min-size-z: 2
 max-size-z: 20
+
+# Flags should match this list. https://worldguard.enginehub.org/en/latest/regions/flags/
+# VERY IMPORTANT to remember the type and what it requires.
+# Strings need to start with ' and end with '.
+default-flags:
+  pvp: deny
+  greeting-title: 'Entering {player}''s region'

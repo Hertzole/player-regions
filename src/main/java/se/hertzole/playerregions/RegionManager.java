@@ -2,24 +2,27 @@ package se.hertzole.playerregions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import se.hertzole.mchertzlib.utils.NumberUtil;
 import se.hertzole.playerregions.data.Setup;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 public class RegionManager {
@@ -35,12 +38,15 @@ public class RegionManager {
     private int maxZ;
     private int maxClaims;
 
+    private HashMap<Flag, Object> regionFlags;
+
     public RegionManager(PlayerRegions plugin) {
         this.plugin = plugin;
     }
 
     public void reloadConfig(FileConfiguration config) {
         reloadLimits(config);
+        reloadFlags(config);
         reloadRegions();
     }
 
@@ -50,6 +56,48 @@ public class RegionManager {
         minZ = config.getInt("min-size-z", 0);
         maxZ = config.getInt("max-size-z", 0);
         maxClaims = config.getInt("max-regions", 0);
+    }
+
+    private void reloadFlags(FileConfiguration config) {
+        Map<String, Object> flagValues = config.getConfigurationSection("default-flags").getValues(true);
+
+        regionFlags = new HashMap<>();
+
+        int index = 0;
+
+        for (String key : flagValues.keySet()) {
+            String value = flagValues.values().toArray()[index].toString();
+            try {
+                Flag flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), key);
+                Object state = getFlagType(value);
+                regionFlags.put(flag, state);
+            } catch (Exception e) {
+                plugin.getGlobalMessenger().tellConsole("&c" + key + " flag does not exist.");
+            }
+            index++;
+        }
+    }
+
+    private Object getFlagType(String value) {
+
+        String trimmedValue = value.toLowerCase().trim();
+        plugin.getGlobalMessenger().tellConsole(value + " | " + trimmedValue);
+
+        if (trimmedValue.equals("allow")) {
+            return StateFlag.State.ALLOW;
+        } else if (trimmedValue.equals("deny")) {
+            return StateFlag.State.DENY;
+        } else if (trimmedValue.equals("true")) {
+            return true;
+        } else if (trimmedValue.equals("false")) {
+            return false;
+        } else if (NumberUtil.canParseDouble(trimmedValue)) {
+            return Double.parseDouble(trimmedValue);
+        } else if (NumberUtil.canParseInteger(trimmedValue)) {
+            return Integer.parseInt(trimmedValue);
+        } else {
+            return value;
+        }
     }
 
     private void reloadRegions() {
@@ -94,6 +142,18 @@ public class RegionManager {
         members.addPlayer(player.getUniqueId());
 
         region.setOwners(members);
+
+        for (Flag flag : regionFlags.keySet()) {
+            if (flag != null) {
+                Object value = regionFlags.get(flag);
+
+                if (value instanceof String) {
+                    value = ((String) value).replace("{player}", ChatColor.stripColor(player.getDisplayName()));
+                }
+
+                region.setFlag(flag, value);
+            }
+        }
 
         RegionContainer container = PlayerRegions.getWorldGuard().getPlatform().getRegionContainer();
         com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(player.getWorld()));
