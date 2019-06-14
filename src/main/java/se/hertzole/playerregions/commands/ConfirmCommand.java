@@ -62,6 +62,7 @@ public class ConfirmCommand implements Command {
 
         plugin.getRegionManager().addRegion(setup, player);
         plugin.getGlobalMessenger().tell(player, Msg.CLAIMED.toString().replace("{region}", setup.displayName));
+        plugin.getPreviewManager().removePreview(player);
     }
 
     @Override

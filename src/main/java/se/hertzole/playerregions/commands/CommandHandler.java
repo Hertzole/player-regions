@@ -18,6 +18,7 @@ public class CommandHandler extends BaseCommandHandler {
         register(DenyCommand.class);
         register(ListCommand.class);
         register(RemoveCommand.class);
+        register(MemberCommand.class);
     }
 
     @Override

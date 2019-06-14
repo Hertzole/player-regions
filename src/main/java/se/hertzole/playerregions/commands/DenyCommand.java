@@ -35,6 +35,7 @@ public class DenyCommand implements Command {
         pr.getSetupManager().removeSetup(player);
 
         plugin.getGlobalMessenger().tell(sender, Msg.DENY_CLAIM);
+        pr.getPreviewManager().removePreview(player);
 
         return true;
     }

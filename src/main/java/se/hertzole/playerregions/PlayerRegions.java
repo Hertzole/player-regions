@@ -23,8 +23,7 @@ public final class PlayerRegions extends HertzPlugin {
 
     private SetupManager setupManager;
     private RegionManager regionManager;
-
-    private Msg messages;
+    private PreviewManager previewManager;
 
     public static PlayerRegions instance;
 
@@ -33,6 +32,11 @@ public final class PlayerRegions extends HertzPlugin {
         instance = this;
 
         setupVault();
+    }
+
+    @Override
+    protected void onDisabled() {
+        previewManager = null;
     }
 
     @Override
@@ -49,7 +53,7 @@ public final class PlayerRegions extends HertzPlugin {
     protected void onSetup() {
         setupManager = new SetupManager(this);
         regionManager = new RegionManager(this);
-
+        previewManager = new PreviewManager(this);
     }
 
     @Override
@@ -89,7 +93,7 @@ public final class PlayerRegions extends HertzPlugin {
 
     @Override
     protected void reloadGlobalMessenger() {
-        String prefix = config.getString("prefix", "&f[&9Custom Enchantments&f]");
+        String prefix = config.getString("prefix", "&f[&aPlayer Regions&f]");
 
         messenger = new Messenger(this, prefix);
     }
@@ -122,6 +126,10 @@ public final class PlayerRegions extends HertzPlugin {
 
     public RegionManager getRegionManager() {
         return regionManager;
+    }
+
+    public PreviewManager getPreviewManager() {
+        return previewManager;
     }
 
     public Economy getEconomy() {

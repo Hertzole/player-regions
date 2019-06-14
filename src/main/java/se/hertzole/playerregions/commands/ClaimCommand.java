@@ -1,5 +1,7 @@
 package se.hertzole.playerregions.commands;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import se.hertzole.mchertzlib.HertzPlugin;
@@ -103,8 +105,8 @@ public class ClaimCommand implements Command {
             return true;
         }
 
-        for (int x = (int) minX; x <= maxX; x++) {
-            for (int z = (int) minZ; z <= maxZ; z++) {
+        for (int x = (int) minX; x <= (int) maxX; x++) {
+            for (int z = (int) minZ; z <= (int) maxZ; z++) {
                 totalCost += costPerColumn;
             }
         }
@@ -116,8 +118,12 @@ public class ClaimCommand implements Command {
         setup.world = player.getWorld();
 
         if (totalCost <= playerMoney) {
+            List<Location> previewLocations = getPreviewLocations(player, minX, maxX, minZ, maxZ);
+
             plugin.getGlobalMessenger().tell(sender, Msg.COST.toString().replace("{cost}", NumberUtil.toPrettyCurrency(totalCost)));
             setup.needsConfirm = true;
+
+            re.getPreviewManager().addPreview(player, previewLocations);
         } else {
             plugin.getGlobalMessenger().tell(sender, Msg.NOT_ENOUGH_MONEY.toString()
                     .replace("{cost}", NumberUtil.toPrettyCurrency(totalCost))
@@ -126,6 +132,38 @@ public class ClaimCommand implements Command {
         }
 
         return true;
+    }
+
+    private List<Location> getPreviewLocations(Player player, double minX, double maxX, double minZ, double maxZ) {
+        List<Location> result = new ArrayList<>();
+
+        for (int x = (int) minX; x <= (int) maxX; x++) {
+            for (int z = (int) minZ; z <= (int) maxZ; z++) {
+                if (x == (int) minX || x == (int) maxX || z == (int) minZ || z == (int) maxZ) {
+                    int y = (int) player.getLocation().getY();
+                    boolean gotBlock = false;
+                    Location loc = null;
+                    boolean doneLap = false;
+                    while (!gotBlock) {
+                        if ((doneLap && y >= 255) || (player.getWorld().getBlockAt(x, y + 1, z).getType() == Material.AIR && player.getWorld().getBlockAt(x, y, z).getType() != Material.AIR)) {
+                            gotBlock = true;
+                            loc = new Location(player.getWorld(), (double) x + 0.5, (double) y + 1.5, (double) z + 0.5);
+                            continue;
+                        }
+
+                        y++;
+                        if (y >= 255 && !doneLap) {
+                            y = 0;
+                            doneLap = true;
+                        }
+                    }
+
+                    result.add(loc);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override

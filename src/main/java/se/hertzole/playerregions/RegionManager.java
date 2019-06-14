@@ -81,7 +81,6 @@ public class RegionManager {
     private Object getFlagType(String value) {
 
         String trimmedValue = value.toLowerCase().trim();
-        plugin.getGlobalMessenger().tellConsole(value + " | " + trimmedValue);
 
         if (trimmedValue.equals("allow")) {
             return StateFlag.State.ALLOW;

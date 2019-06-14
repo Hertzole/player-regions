@@ -23,6 +23,7 @@ permissions:
       playerregions.user.confirm: true
       playerregions.user.deny: true
       playerregions.user.list: true
+      playerregions.user.member: true
       playerregions.user.remove: true
       playerregions.user.pos: true
   playerregions.admin:
