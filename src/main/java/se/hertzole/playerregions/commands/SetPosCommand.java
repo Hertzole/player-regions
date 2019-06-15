@@ -12,7 +12,7 @@ import se.hertzole.playerregions.data.Setup;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandInfo(name = "pos", permission = "playerregions.user.pos", pattern = "pos", usage = "/pr pos <1 or 2>",
+@CommandInfo(name = "pos", permission = "playerregions.user.pos", pattern = "pos", usage = "/pr pos <1:2>",
         desc = "Sets the two location to claim.", console = false)
 public class SetPosCommand implements Command {
 

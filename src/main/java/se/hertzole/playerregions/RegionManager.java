@@ -220,6 +220,11 @@ public class RegionManager {
         return false;
     }
 
+    public boolean playerHasRegionWithName(Player player, String regionName) {
+        regionName = regionName.replace(" ", "_").toLowerCase();
+        return playerHasRegion(player, regionName);
+    }
+
     public List<String> getPlayerRegionNames(Player player) {
         List<String> result = new ArrayList<>();
         FileConfiguration regionsConfig = getRegionsConfig();
@@ -261,6 +266,23 @@ public class RegionManager {
         result = regionsConfig.getConfigurationSection("players." + player.getUniqueId()).getKeys(false).size();
 
         return result;
+    }
+
+    public ProtectedRegion getRegion(Player player, String id) {
+        ProtectedRegion result = null;
+
+        com.sk89q.worldguard.protection.managers.RegionManager container = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(player.getWorld()));
+        if (container != null) {
+            FileConfiguration config = getRegionsConfig();
+            result = container.getRegion(config.getString("players." + player.getUniqueId() + "." + id + ".id"));
+        }
+
+        return result;
+    }
+
+    public ProtectedRegion getRegionWithName(Player player, String name) {
+        name = name.replace(" ", "_").toLowerCase();
+        return getRegion(player, name);
     }
 
     public int getMinX() {

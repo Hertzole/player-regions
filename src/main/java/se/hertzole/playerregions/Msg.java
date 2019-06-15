@@ -31,6 +31,14 @@ public enum Msg implements Message {
     REMOVE("You're about to remove '{region}'. You will be refunded &a${refund}&r. Write &a/pr confirm&r to proceed or &c/pr deny&r to cancel."),
     REMOVED("Successfully removed '{region}'! You were refunded &a${refund}&r."),
 
+    MEMBER_ADD_OR_REMOVE("&cYou need to specify if you want to 'add' or 'remove' a member."),
+    MEMBER_SPECIFY_PLAYER("&cYou need to specify a player to add."),
+    MEMBER_NO_PLAYER("&cThere's no player with that name on the server."),
+    MEMBER_YOURSELF("&cYou can't add or remove yourself from your own region."),
+    MEMBER_SPECIFY_REGION("&cYou need to specify what region you want to {action} this player {destination}."),
+    MEMBER_ADD("&aAdded {player} as a member to {region}!"),
+    MEMBER_REMOVE("&aRemoved {player} as a member from {region}!"),
+
     NO_REGIONS("&cYou don't have any claimed regions."),
     NO_REGION("&cYou don't have a claimed region called '{region}'."),
 

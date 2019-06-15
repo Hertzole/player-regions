@@ -140,7 +140,7 @@ public class ClaimCommand implements Command {
         for (int x = (int) minX; x <= (int) maxX; x++) {
             for (int z = (int) minZ; z <= (int) maxZ; z++) {
                 if (x == (int) minX || x == (int) maxX || z == (int) minZ || z == (int) maxZ) {
-                    int y = (int) player.getLocation().getY();
+                    int y = (int) player.getLocation().getY() - 1;
                     boolean gotBlock = false;
                     Location loc = null;
                     boolean doneLap = false;
